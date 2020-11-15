@@ -227,7 +227,7 @@ def summarize(url_topull, num_of_words):
     scraped_data = urllib.request.urlopen(url_topull)  
     article = scraped_data.read()
     
-    parsed_article = bs.BeautifulSoup(article,'lxml')
+    parsed_article = bs.BeautifulSoup(article,'html.parser')
     paragraphs = parsed_article.find_all('p')
     article_text = ""
     for p in paragraphs:  
