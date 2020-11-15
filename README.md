@@ -1,27 +1,45 @@
-# 1-stop-shortener
+<h1 align="center">:books::newspaper: A1-Summit :movie_camera::bookmark_tabs:</h1>
 
-1 Stop Shortener tool can be used to summarise:
+<div align="center">
 
-1. Hindu News Article
+<img src="./circle-cropped-1.png"></img>
+
+<br>
+
+[![](https://img.shields.io/badge/Made_with-Python3-red?style=for-the-badge&logo=python)]("Python3")
+[![](https://img.shields.io/badge/Framework-Streamlit-red?style=for-the-badge&logo=streamlit)]("Streamlit")
+[![](https://img.shields.io/badge/Deployed_on-Heroku-red?style=for-the-badge&logo=heroku)](https://www.heroku.com/  "Heroku")
+
+<br>
+
+</div>
+
+## What is A-1 Summit?
+
+A-1 Summit is an "All-in-1" Summariser, where you can summarise:
+
+1. The Hindu News Article
 2. Wikipedia Articles
 3. Simple Text Paragraphs
-4. Youtube Videos
+4. YouTube Videos (transcript enabled)
 
-It uses an ​extractive approach​ and is ​an unsupervised graph​ based textual content summarization method. It is based on the Page-Rank technique used by search engines like google to provide the top prioritized pages or links to the end -user based on his/her search using this ranking algorithm to calculate the rank of the web-pages.
+It uses an **extractive approach** and is an **unsupervised graph** based textual content summarization method. It is based on the **Page-Rank Algorithm** used by search engines like Google to provide the top prioritized pages or links to the end-user based on his/her search using this ranking algorithm to calculate the rank of the web-pages.
 
+App live at: https://a1-summit.herokuapp.com/
 
-Watch this demo: https://youtu.be/x9w27wqZdO4
+## To try locally in your machine: 
 
-App live at: https://onestopshortener.herokuapp.com/
+1. Clone this repository: 
 
-## Installation
+ `git clone https://github.com/arghyadeep99/A1-Summit.git`
+ 
+2. Install the requirements from requirements.txt.
 
-Install the requirements from requirements.txt
-```bash
-pip install -r requirements.txt
-```
+`pip install -r requirements.txt`
 
+3. cd into the A1-Summit repository and run:
 
+`streamlit run A1-Summit.py`
 
 ## Usage
 ### 1. Hindu News Article
@@ -30,18 +48,18 @@ Enter the Hindu News Article Link in the respective input field and number of se
 
 Example
 ```
-Link: https://www.thehindu.com/news/national/pm-modi-congratulates-new-zealand-counterpart-jacinda-ardern-on-poll-win/article32885939.ece
+Link: https://www.thehindu.com/news/international/trump-appears-to-acknowledge-for-first-time-that-biden-could-succeed-him/article33099094.ece
 Number of Sentences: 10
 ```
 
 ### 2. Wikipedia Articles
 
-Enter the Wikipedia Article Link in the respective input field and number of words of summarized text in respective input field.
+Enter the Wikipedia Article Link in the respective input field and **number of words** of summarized text in respective input field.
 
 Example
 ```
-Link: https://en.wikipedia.org/wiki/Python_(programming_language)
-Number of Words : 300
+Link: https://en.wikipedia.org/wiki/Kharghar
+Number of Words : 100
 ```
 
 ### 3. Simple Text Paragraphs
@@ -54,15 +72,14 @@ Text Area: Copy SampleData.txt into that text area
 Number of Sentences: 10
 ```
 
-### 4. Youtube Videos
+### 4. YouTube Videos
 Enter the Video id of Youtube video to summarize in the respective input field and number of sentences required of summarized text in respective input field.
 
-Example
+Example:
+For Video https://www.youtube.com/watch?v=KR0g-1hnQPA, enter the following details:
 ```
-For Video https://www.youtube.com/watch?v=KR0g-1hnQPA
-Enter the following details
 Youtube Video Id: KR0g-1hnQPA
-Number of Sentences: 5
+Number of Sentences: 10
 ```
 
 ## Contributing
