@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="./circle-cropped-1.png"></img>
+<img src="./circle-cropped-1.png" height=200px width=250px></img>
 
 <br>
 
@@ -82,9 +82,15 @@ Youtube Video Id: KR0g-1hnQPA
 Number of Sentences: 10
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+#### This project still has scope of development, so you can also contribute to this Project as follows:
+* [Fork](https://github.com/arghyadeep99/A1-Summit) this Repository.
+* Clone your Fork on a different branch:
+	* `git clone -b <name-of-branch> https://github.com/arghyadeep99/A1-Summit.git`
+* After adding any feature:
+	* Goto your fork and create a pull request.
+	* We will test your modifications and merge changes.
 
-Please make sure to update tests as appropriate.
+This project was done as a project of our lab course `Natural Language Processing`.
 
-
+---
+<h3 align="center"><b>Developed with :heart: by <a href="https://github.com/RusherRG">Rushang Gajjal</a>, <a href="https://github.com/arghyadeep99">Arghyadeep Das</a> and <a href="https://github.com/Korusuke">Karan Sheth</a>.</b></h1>
