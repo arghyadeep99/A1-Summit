@@ -210,11 +210,12 @@ def textforYT():
     text.replace("\n"," ")
 
     sent_tokens, word_tokens = sent_tokenize(text), word_tokenize(text)
-    sent_ranks = score_tokens(sent_tokens, word_tokens)
-    summary, sum_scores = summarize(text, no_of_sentences)
+    sent_ranks = score_tokens(sent_tokens, word_tokens)    
     
     st.subheader('Summarised text: ')
-    st.write(summary)
+    
+    summary, sum_scores = summarize(text, no_of_sentences)
+
     
     subh = 'Summary sentence score for the top ' + str(no_of_sentences) + ' sentences: '
 
