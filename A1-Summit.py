@@ -23,6 +23,7 @@ from string import punctuation
 from nltk.probability import FreqDist
 from heapq import nlargest
 from collections import defaultdict
+import textrank as tr
 
     
 def tokenizer(s):
@@ -72,19 +73,6 @@ def score_sentences(sents, freq_dist, max_len=40):
                         
     return sent_scores
 
-def summarize(sent_scores, k):
-    top_sents = Counter(sent_scores) 
-    summary = ''
-    scores = []
-    
-    top = top_sents.most_common(k)
-    
-    for t in top: 
-        summary += t[0].strip() + '. '
-        scores.append((t[1], t[0]))
-        
-    return summary[:-1], scores
-
 
 st.title('Text Summarization')
 st.subheader('One stop for all types of summarizations')
@@ -100,42 +88,44 @@ st.sidebar.markdown('[![]\
 st.sidebar.markdown('<center>The All-in-1 Summariser for your news articles, Wiki articles, notes and YouTube videos!</center>',unsafe_allow_html=True)
 st.sidebar.markdown('<center> <h3>Made By <a href="https://github.com/RusherRG" target="_blank">Rushang Gajjal</a>, <a href="https://arghyadeepdas.tech" target="_blank">Arghyadeep Das</a> and <a href="https://kiteretsu.tech" target="_blank">Karan Sheth</a>.</h3></center>',unsafe_allow_html=True)
 
+def print_usage():
+    # Display the parameters and what they mean.
+    st.write('''
+    Usage:
+        summarize.py <wiki-url> <summary length>
+    Explanation:
+        Parameter 1: Wikipedia URL to pull
+        Parameter 2: the number of words for the summary to contain
+    ''')
 
+def summarize(article_text, num_of_sentences):
+    # Extract keywords
+    stop_words = set(stopwords.words('english')) 
+    keywords = mz_keywords(article_text,scores=True,threshold=0.003)
+    keywords_names = []
+    for tuples in keywords:
+        if tuples[0] not in stop_words: 
+            if len(tuples[0]) > 2:
+                keywords_names.append(tuples[0])
 
+    
+    pre_summary, rank_sum = tr.textrank_summarise(article_text, num_of_sentences)
+    
+    summary = re.sub("[\(\[].*?[\)\]♪]", "", pre_summary)
+    
+    print_pretty(summary, keywords_names)
+    
+    return summary, rank_sum
 
-url = st.text_input('\nEnter URL of news article from The Hindu Newspaper: ')
-
-wikiurl = st.text_input('\nEnter URL of Wikipedia article: ')
-video_id = st.text_input("\nEnter the Youtube Video Id:")
-# video_id = "Na8vHaCLwKc" 
-textfield123 = st.text_area('\nEnter article or paragraph you want to summarize ')
-no_of_sentences = st.number_input('Choose the no. of sentences in the summary (no. of words for Wiki article)', min_value = 1)
-
-def textfunc():
-
-    content = textfield123
-    content = sanitize_input(content)
-
-    sent_tokens, word_tokens = tokenize_content(content)
-    sent_ranks = score_tokens(sent_tokens, word_tokens)
-    st.write(summarize2(sent_ranks, sent_tokens, no_of_sentences))
-
-def textforYT():
-
-    a = ytapi.get_transcript(video_id)
-    textstr = ""
-    for i in a:
-        textstr += i["text"]
-    article = [textstr[i:i + 100] for i in range(0, len(textstr), 100)]
-    res = '. '.join(textstr[i:i + 100] for i in range(0, len(textstr), 100))
-    content = res
-
-
-    sent_tokens, word_tokens = tokenize_content(content)
-    sent_ranks = score_tokens(sent_tokens, word_tokens)
-    st.write(summarize2(sent_ranks, sent_tokens, no_of_sentences))
-
-
+def print_pretty (summary, keywords_names):
+    columns = os.get_terminal_size().columns
+    
+    printable = summary
+    st.write(printable.center(columns))
+    str_keywords_names = str(keywords_names).strip('[]')
+    printable2 = str_keywords_names
+    st.write("Keywords: ",printable2.center(columns))
+    
 def tokenize_content(content):
     stop_words = set(stopwords.words('english') + list(punctuation))
     words = word_tokenize(content.lower())
@@ -172,6 +162,71 @@ def summarize2(ranks, sentences, length):
 
 
 
+url = st.text_input('\nEnter URL of news article from The Hindu Newspaper: ')
+
+wikiurl = st.text_input('\nEnter URL of Wikipedia article: ')
+video_id = st.text_input("\nEnter the Youtube Video Id:")
+# video_id = "Na8vHaCLwKc" 
+textfield123 = st.text_area('\nEnter article or paragraph you want to summarize ')
+no_of_sentences = st.number_input('Choose the no. of sentences in the summary:', min_value = 1)
+
+def textfunc():
+
+    content = textfield123
+    content = sanitize_input(content)
+
+    text = re.sub(r'\[[0-9]*\]', ' ', content)
+    text = re.sub(r'\s+', ' ', text)
+    
+    st.subheader('Original text: ')
+    st.write(text)
+    
+    tokens = word_tokenize(text)
+    sents = sent_tokenize(text)
+    word_counts = count_words(tokens)
+    freq_dist = word_freq_distribution(word_counts)
+    sent_scores = score_sentences(sents, freq_dist)
+    st.subheader('Summarised text: ')
+
+    summary, sum_scores = summarize(text, no_of_sentences)
+        
+    subh = 'Summary sentence score for the top ' + str(no_of_sentences) + ' sentences: '
+
+    st.subheader(subh)
+    summ_sentences = sent_tokenize(summary)
+    data = list(zip(summ_sentences, sum_scores))
+        
+    df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
+
+    st.table(df)
+
+def textforYT():
+
+    transcript = ytapi.get_transcript(video_id)
+    text = ""
+    for i in transcript:
+        text += i["text"]
+        text += " "
+    text.replace("\n"," ")
+
+    sent_tokens, word_tokens = sent_tokenize(text), word_tokenize(text)
+    sent_ranks = score_tokens(sent_tokens, word_tokens)
+    summary, sum_scores = summarize(text, no_of_sentences)
+    
+    st.subheader('Summarised text: ')
+    st.write(summary)
+    
+    subh = 'Summary sentence score for the top ' + str(no_of_sentences) + ' sentences: '
+
+    st.subheader(subh)
+    summ_sentences = sent_tokenize(summary)
+    data = list(zip(summ_sentences, sum_scores))
+        
+    df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
+
+    st.table(df)
+
+
 if url and no_of_sentences and st.button('Summarize The Hindu Article'):
     text = ""
     
@@ -188,12 +243,12 @@ if url and no_of_sentences and st.button('Summarize The Hindu Article'):
     st.subheader('Original text: ')
     st.write(text)
     
-    tokens = tokenizer(text)
-    sents = sent_tokenizer(text)
+    tokens = word_tokenize(text)
+    sents = sent_tokenize(text)
     word_counts = count_words(tokens)
     freq_dist = word_freq_distribution(word_counts)
     sent_scores = score_sentences(sents, freq_dist)
-    summary, summary_sent_scores = summarize(sent_scores, no_of_sentences)
+    summary, sum_scores = summarize(text, no_of_sentences)
     
     st.subheader('Summarised text: ')
     st.write(summary)
@@ -201,76 +256,48 @@ if url and no_of_sentences and st.button('Summarize The Hindu Article'):
     subh = 'Summary sentence score for the top ' + str(no_of_sentences) + ' sentences: '
 
     st.subheader(subh)
-    
-    data = []
-
-    for score in summary_sent_scores: 
-        data.append([score[1], score[0]])
+    summ_sentences = sent_tokenize(summary)
+    data = list(zip(summ_sentences, sum_scores))
         
     df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
 
     st.table(df)
-    st.info('An NLP application made by Rushang, Arghyadeep and Karan.')
 
-def print_usage():
-    # Display the parameters and what they mean.
-    st.write('''
-    Usage:
-        summarize.py <wiki-url> <summary length>
-    Explanation:
-        Parameter 1: Wikipedia URL to pull
-        Parameter 2: the number of words for the summary to contain
-    ''')
-
-def summarize(url_topull, num_of_words):
-    # Obtain text
-    scraped_data = urllib.request.urlopen(url_topull)  
-    article = scraped_data.read()
-    
-    parsed_article = bs.BeautifulSoup(article,'lxml')
-    paragraphs = parsed_article.find_all('p')
-    article_text = ""
-    for p in paragraphs:  
-        article_text += p.text
-
-    # Extract keywords
-    stop_words = set(stopwords.words('english')) 
-    keywords = mz_keywords(article_text,scores=True,threshold=0.003)
-    keywords_names = []
-    for tuples in keywords:
-        if tuples[0] not in stop_words: 
-            if len(tuples[0]) > 2:
-                keywords_names.append(tuples[0])
-
-    
-    pre_summary = su_gs(article_text,word_count=num_of_words)
-    
-    summary = re.sub("[\(\[].*?[\)\]]", "", pre_summary)
-    
-    print_pretty (summary,keywords_names)
-
-def print_pretty (summary, keywords_names):
-    columns = os.get_terminal_size().columns
-    
-    printable = summary
-    st.write(printable.center(columns))
-    str_keywords_names = str(keywords_names).strip('[]')
-    printable2 = str_keywords_names
-    st.write(printable2.center(columns))
-
-if wikiurl and no_of_sentences and st.button('Summarize WikiPedia Article'):
+if wikiurl and no_of_sentences and st.button('Summarize Wikipedia Article'):
     if not str(no_of_sentences).isdigit():
         print_usage()
     else:
-        summarize(wikiurl, int(no_of_sentences))
+        scraped_data = urllib.request.urlopen(wikiurl)  
+        article = scraped_data.read()
+
+        parsed_article = bs.BeautifulSoup(article,'lxml')
+        paragraphs = parsed_article.find_all('p')
+        article_text = ""
+        for p in paragraphs:  
+            article_text += p.text
+        
+        
+        st.subheader('Summarised text: ')
+        summary, sum_scores = summarize(article_text, int(no_of_sentences))
+
+        subh = 'Summary sentence score for the top ' + str(no_of_sentences) + ' sentences: '
+
+        st.subheader(subh)
+        summ_sentences = sent_tokenize(summary)
+        data = list(zip(summ_sentences, sum_scores))
+
+        df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
+
+        st.table(df)
 
 if textfield123 and no_of_sentences and st.button('Summarize Text'):
     if not str(no_of_sentences).isdigit():
         st.write("Use it again. Error occured summarizing article.")
     else:
         textfunc()
-if video_id and no_of_sentences and st.button('Summarize Youtube video'):
+if video_id and no_of_sentences and st.button('Summarize YouTube video'):
     if not str(no_of_sentences).isdigit():
         st.write("Use it again. Error occured summarizing article.")
     else:
         textforYT()
+
