@@ -94,7 +94,6 @@ def cosine_similarity(s1, s2):
 
 def page_rank(graph, len_clean_sent, iterations = 50,sentences=20):
     ranks = []
-    # ranks = {}
     network = graph.graph_dictionary
     current_ranks = np.squeeze(np.zeros((1, len_clean_sent)))
     prev_ranks = np.array([1/len_clean_sent]*len_clean_sent)
@@ -108,7 +107,6 @@ def page_rank(graph, len_clean_sent, iterations = 50,sentences=20):
     prev_ranks = current_ranks
 
     for index in range(len_clean_sent):
-      # ranks[index] = prev_ranks[index]
         if prev_ranks[index]: 
             ranks.append((index,prev_ranks[index]))
     ranks = sorted(ranks,key = lambda x:x[1],reverse=True)[:sentences]
