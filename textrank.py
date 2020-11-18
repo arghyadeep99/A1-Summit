@@ -6,6 +6,8 @@ from nltk.tokenize import sent_tokenize,word_tokenize
 from bs4 import BeautifulSoup
 import requests
 import re
+from rouge import Rouge
+
 
 nltk.download('wordnet')
 nltk.download('punkt')
@@ -154,3 +156,26 @@ def textrank_summarise(paragraph, no_of_sentences):
     summary = summary.strip()
     
     return summary, ranks_sum
+
+def bleu_score(original, generated):
+    smoothing = SmoothingFunction().method0
+    original_tokens = word_tokenize(original)
+    generated_tokens = word_tokenize(generated)
+    result = sentence_bleu(original_tokens, generated_tokens, smoothing_function=smoothing)
+    return result
+
+def rouge(original, generated):
+    rouge = Rouge()
+    score = rouge.get_scores(original,generated)
+    rouge1f = score[0]['rouge-1']['f']
+    rouge1p = score[0]['rouge-1']['p']
+    rouge1r = score[0]['rouge-1']['r']
+    rouge2f = score[0]['rouge-2']['f']
+    rouge2p = score[0]['rouge-2']['p']
+    rouge2r = score[0]['rouge-2']['r']
+    rougelf = score[0]['rouge-l']['f']
+    rougelp = score[0]['rouge-l']['p']
+    rougelr = score[0]['rouge-l']['r']
+    
+    return (rouge1f, rouge1p, rouge1r), (rouge2f, rouge2p, rouge2r), (rougelf, rougelp, rougelr)
+

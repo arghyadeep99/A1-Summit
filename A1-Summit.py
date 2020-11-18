@@ -74,8 +74,8 @@ def score_sentences(sents, freq_dist, max_len=40):
     return sent_scores
 
 
-st.title('Text Summarization')
-st.subheader('One stop for all types of summarizations')
+st.title('Text Summarization using TextRank Algorithm')
+st.subheader('One stop for all types of summarizations!')
 
 
 image = Image.open('circle-cropped-1.png')
@@ -160,7 +160,14 @@ def summarize2(ranks, sentences, length):
         final_summary = [sentences[j] for j in indices]
         return ' '.join(final_summary)
 
-
+def print_rouge(par, summ):
+    (f11, p1, r1), (f12, p2, r2), (f1l, pl, rl)  = tr.rouge(par, summ)
+    precision = [p1, p2, pl]
+    recall = [r1, r2, rl]
+    f1 = [f11, f12, f1l]
+    df = pd.DataFrame(list(zip(precision, recall, f1)), columns=["Precision", "Recall", "F-1 Score"], index=["ROUGE-1", "ROUGE-2", "ROUGE-L"])
+    st.subheader("ROUGE Scores")
+    st.table(df)
 
 url = st.text_input('\nEnter URL of news article from The Hindu Newspaper: ')
 
@@ -199,6 +206,7 @@ def textfunc():
     df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
 
     st.table(df)
+    print_rouge(text, summary)
 
 def textforYT():
 
@@ -226,6 +234,7 @@ def textforYT():
     df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
 
     st.table(df)
+    print_rouge(text, summary)
 
 
 if url and no_of_sentences and st.button('Summarize The Hindu Article'):
@@ -263,6 +272,7 @@ if url and no_of_sentences and st.button('Summarize The Hindu Article'):
     df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
 
     st.table(df)
+    print_rouge(text, summary)
 
 if wikiurl and no_of_sentences and st.button('Summarize Wikipedia Article'):
     if not str(no_of_sentences).isdigit():
@@ -290,6 +300,7 @@ if wikiurl and no_of_sentences and st.button('Summarize Wikipedia Article'):
         df = pd.DataFrame(data, columns = ['Sentence', 'Score'])
 
         st.table(df)
+        print_rouge(article_text, summary)
 
 if textfield123 and no_of_sentences and st.button('Summarize Text'):
     if not str(no_of_sentences).isdigit():
