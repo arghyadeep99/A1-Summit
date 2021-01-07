@@ -25,7 +25,7 @@ A-1 Summit is an "All-in-1" Summariser, where you can summarise:
 
 It uses an **extractive approach** and is an **unsupervised graph** based textual content summarization method. It is based on the **Page-Rank Algorithm** used by search engines like Google to provide the top prioritized pages or links to the end-user based on his/her search using this ranking algorithm to calculate the rank of the web-pages.
 
-App live at: https://a1-summit.herokuapp.com/
+App live at: https://share.streamlit.io/arghyadeep99/ms-teams-attendance/main/attendance.py
 
 ## To try locally in your machine: 
 
